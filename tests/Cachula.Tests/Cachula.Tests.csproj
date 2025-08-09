@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Cachula\Cachula.csproj" />
+      <ProjectReference Include="..\..\src\Cachula\Cachula.csproj" />
     </ItemGroup>
 
 </Project>

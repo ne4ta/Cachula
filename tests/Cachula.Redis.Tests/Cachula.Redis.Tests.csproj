@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Cachula.Redis\Cachula.Redis.csproj" />
+        <ProjectReference Include="..\..\src\Cachula.Redis\Cachula.Redis.csproj" />
         <ProjectReference Include="..\Cachula.Tests\Cachula.Tests.csproj" />
     </ItemGroup>
 

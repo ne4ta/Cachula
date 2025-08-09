@@ -1,12 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cachula", "Cachula\Cachula.csproj", "{CFEA763A-C4C1-4BBA-98F4-656BB0D006B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cachula", "src\Cachula\Cachula.csproj", "{CFEA763A-C4C1-4BBA-98F4-656BB0D006B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cachula.Redis", "Cachula.Redis\Cachula.Redis.csproj", "{FBB4247D-2DB6-4F5A-97D3-D1D2375E417F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cachula.Redis", "src\Cachula.Redis\Cachula.Redis.csproj", "{FBB4247D-2DB6-4F5A-97D3-D1D2375E417F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cachula.Tests", "Cachula.Tests\Cachula.Tests.csproj", "{BD1BFD74-66D4-42C4-AB90-398C64F25E6D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cachula.Tests", "tests\Cachula.Tests\Cachula.Tests.csproj", "{BD1BFD74-66D4-42C4-AB90-398C64F25E6D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cachula.Redis.Tests", "Cachula.Redis.Tests\Cachula.Redis.Tests.csproj", "{085FABC2-795A-4457-BD26-01BCC2E6F7D8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cachula.Redis.Tests", "tests\Cachula.Redis.Tests\Cachula.Redis.Tests.csproj", "{085FABC2-795A-4457-BD26-01BCC2E6F7D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
