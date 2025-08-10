@@ -6,6 +6,14 @@
 
 </div>
 
+<div align="center">
+
+[![Build](https://github.com/ne4ta/Cachula/actions/workflows/ci.yml/badge.svg)](https://github.com/ne4ta/Cachula/actions/workflows/ci.yml)
+[![NuGet](https://img.shields.io/nuget/v/Cachula.svg)](https://www.nuget.org/packages/Cachula/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/Cachula.svg)](https://www.nuget.org/packages/Cachula/)
+[![License](https://img.shields.io/github/license/ne4ta/Cachula.svg)](LICENSE)
+
+</div>
 
 Cachula is a flexible, multi-layer caching library for .NET, designed for modern distributed applications. It supports in-memory and distributed cache layers, cache stampede protection, and seamless integration with dependency injection. Cachula is inspired by the best practices of modern caching libraries, with a special focus on efficient bulk operations.
 
@@ -102,4 +110,3 @@ services.WithDistributedCache(redisCache);
 **Q: How is Cachula different from FusionCache or CacheTower?**
 - Cachula is focused on batch/bulk operations and multi-layer composition, with a simple, extensible API.
 - It is designed for scenarios where you need to cache and retrieve many items at once efficiently.
-

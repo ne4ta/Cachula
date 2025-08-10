@@ -43,7 +43,10 @@ public class CachulaRedisCache : ICachulaDistributedCache
     /// <inheritdoc />
     public async Task<CachulaCacheEntry<T>> GetAsync<T>(string key, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(key);
+        if (key == null)
+        {
+            throw new ArgumentNullException(nameof(key));
+        }
 
         var value = await _redisDatabase.StringGetAsync(key);
         return FromRedisValue<T>(value);
@@ -52,7 +55,10 @@ public class CachulaRedisCache : ICachulaDistributedCache
     /// <inheritdoc />
     public Task SetAsync<T>(string key, T value, TimeSpan expiration, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(key);
+        if (key == null)
+        {
+            throw new ArgumentNullException(nameof(key));
+        }
 
         var redisValue = ToRedisValue(value, expiration);
         return _redisDatabase.StringSetAsync(key, redisValue, expiration);
@@ -78,7 +84,10 @@ public class CachulaRedisCache : ICachulaDistributedCache
     public async Task SetManyAsync<T>(
         IDictionary<string, T> values, TimeSpan ttl, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(values);
+        if (values == null)
+        {
+            throw new ArgumentNullException(nameof(values));
+        }
 
         foreach (var keyValuePairs in values.Chunk(_settings.BatchSize))
         {
@@ -96,7 +105,10 @@ public class CachulaRedisCache : ICachulaDistributedCache
     /// <inheritdoc />
     public async Task RemoveManyAsync(IEnumerable<string> keys, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(keys);
+        if (keys == null)
+        {
+            throw new ArgumentNullException(nameof(keys));
+        }
 
         var redisKeys = keys.Select(k => (RedisKey)k).ToArray();
         await _redisDatabase.KeyDeleteAsync(redisKeys).ConfigureAwait(false);

@@ -1,20 +1,45 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;net8.0;net9.0</TargetFrameworks>
+        <LangVersion>latest</LangVersion>
+        <Version>0.1.0-beta.1</Version>
+        <PackageReleaseNotes>Initial beta of Redis provider (netstandard2.0/net8.0/net9.0).</PackageReleaseNotes>
         <OutputType>Library</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
+        <Authors>Dzmitry Koush</Authors>
+        <PackageId>Cachula.Redis</PackageId>
+        <Description>Redis provider for Cachula: multi-layer caching with Redis backend, cache stampede protection, bulk ops and DI integration.</Description>
+        <PackageTags>cache;caching;redis;distributed-cache;cachula</PackageTags>
+        <PackageProjectUrl>https://github.com/ne4ta/Cachula</PackageProjectUrl>
+        <EnablePackageValidation>true</EnablePackageValidation>
+        <RepositoryUrl>https://github.com/ne4ta/Cachula</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>logo128.png</PackageIcon>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <Deterministic>true</Deterministic>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.5" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
-        <PackageReference Include="StackExchange.Redis" Version="2.8.37" />
+        <PackageReference Include="StackExchange.Redis" Version="[2.8.0,3.0.0)" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Cachula\Cachula.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\..\docs\logo128.png" Pack="true" PackagePath="" />
+        <None Include="..\..\README.md" Pack="true" PackagePath="" />
     </ItemGroup>
 
 </Project>

@@ -36,8 +36,15 @@ internal class CachulaEngine : ICachulaEngine
     public async Task<CachulaCacheEntry<T>> GetOrSetAsync<T>(
         string key, Func<Task<T?>> valueFactory, TimeSpan ttl, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(key);
-        ArgumentNullException.ThrowIfNull(valueFactory);
+        if (key == null)
+        {
+            throw new ArgumentNullException(nameof(key));
+        }
+
+        if (valueFactory == null)
+        {
+            throw new ArgumentNullException(nameof(valueFactory));
+        }
 
         var firstLayer = _layers[0];
         var entry = await firstLayer.GetAsync<T>(key, cancellationToken);
@@ -73,7 +80,10 @@ internal class CachulaEngine : ICachulaEngine
     /// <inheritdoc />
     public async Task SetAsync<T>(string key, T value, TimeSpan ttl, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(key);
+        if (key == null)
+        {
+            throw new ArgumentNullException(nameof(key));
+        }
 
         var tasks = _layers.Select(layer => layer.SetAsync(key, value, ttl, cancellationToken));
         await Task.WhenAll(tasks);
@@ -86,8 +96,15 @@ internal class CachulaEngine : ICachulaEngine
         TimeSpan ttl,
         CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(keys);
-        ArgumentNullException.ThrowIfNull(valueFactory);
+        if (keys == null)
+        {
+            throw new ArgumentNullException(nameof(keys));
+        }
+        
+        if (valueFactory == null)
+        {
+            throw new ArgumentNullException(nameof(valueFactory));
+        }
 
         var keyArray = keys.Distinct().ToArray();
 
@@ -127,7 +144,11 @@ internal class CachulaEngine : ICachulaEngine
     public async Task SetManyAsync<T>(
         IDictionary<string, T> values, TimeSpan ttl, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(values);
+        if (values == null)
+        {
+            throw new ArgumentNullException(nameof(values));
+        }
+        
         if (!values.Any())
         {
             return;
@@ -140,7 +161,10 @@ internal class CachulaEngine : ICachulaEngine
     /// <inheritdoc />
     public async Task RemoveManyAsync(IEnumerable<string> keys, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(keys);
+        if (keys == null)
+        {
+            throw new ArgumentNullException(nameof(keys));
+        }
 
         var distinctKeys = keys.Distinct().ToList();
         if (distinctKeys.Count == 0)

@@ -58,10 +58,18 @@ public class CachulaCacheEntry<T>
     /// </summary>
     public bool IsMissed { get; init; }
 
+    /// <summary>
+    /// Constructor for deserialization purposes.
+    /// </summary>
     public CachulaCacheEntry()
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CachulaCacheEntry{T}"/> class with a value and TTL.
+    /// </summary>
+    /// <param name="value">The cached value.</param>
+    /// <param name="ttl">The time to live for the cached value.</param>
     public CachulaCacheEntry(T? value, TimeSpan ttl)
     {
         IsNull = value is null;

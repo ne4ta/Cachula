@@ -21,7 +21,11 @@ public static class DependencyInjection
     /// </remarks>
     public static IServiceCollection PutOnCachula(this IServiceCollection services)
     {
-        ArgumentNullException.ThrowIfNull(services);
+        if (services == null)
+        {
+            throw new ArgumentNullException(nameof(services));
+        }
+        
         services.AddSingleton<ICachulaCache, CachulaCache>();
         services.AddSingleton<ICachulaEngine, CachulaEngine>();
         services.AddSingleton<IStampedeProtector, InMemorySingleFlightProtector>();
@@ -35,7 +39,10 @@ public static class DependencyInjection
     /// <returns>The updated service collection with the memory cache layer registered.</returns>
     public static IServiceCollection WithMemoryCache(this IServiceCollection services)
     {
-        ArgumentNullException.ThrowIfNull(services);
+        if (services == null)
+        {
+            throw new ArgumentNullException(nameof(services));
+        }
 
         services.AddSingleton<ICacheLayer, CachulaMemoryCache>();
         return services;
@@ -50,8 +57,15 @@ public static class DependencyInjection
     public static IServiceCollection WithDistributedCache(
         this IServiceCollection services, ICachulaDistributedCache distributedCache)
     {
-        ArgumentNullException.ThrowIfNull(services);
-        ArgumentNullException.ThrowIfNull(distributedCache);
+        if (services == null)
+        {
+            throw new ArgumentNullException(nameof(services));
+        }
+        
+        if (distributedCache == null)
+        {
+            throw new ArgumentNullException(nameof(distributedCache));
+        }
 
         if (services.All(sd => sd.ServiceType != typeof(ICacheLayer)))
         {
