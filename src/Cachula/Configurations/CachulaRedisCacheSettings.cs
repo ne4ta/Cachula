@@ -8,5 +8,5 @@ public class CachulaRedisCacheSettings
     /// <summary>
     /// Gets the batch size for Redis cache operations.
     /// </summary>
-    public int BatchSize { get; init; }
+    public int BatchSize { get; init; } = 100;
 }

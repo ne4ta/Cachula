@@ -14,21 +14,18 @@ public class CachulaRedisCache : ICachulaDistributedCache
 {
     private readonly IDatabase _redisDatabase;
     private readonly JsonSerializerOptions _serializerOptions;
-    private readonly CachulaRedisCacheSettings _settings = new()
-    {
-        // TODO: Make it configurable via DI or options pattern.
-        BatchSize = 100,
-    };
+    private readonly CachulaRedisCacheSettings _settings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CachulaRedisCache"/> class.
     /// </summary>
     /// <param name="redisDatabase">The Redis database instance.</param>
     /// <param name="serializerOptions">Optional serializer options for JSON serialization.</param>
+    /// <param name="settings">Optional settings for Cachula Redis cache (e.g., BatchSize).</param>
     /// <remarks>
     /// This constructor requires an instance of <see cref="IDatabase"/> from StackExchange.Redis.
     /// </remarks>
-    public CachulaRedisCache(IDatabase redisDatabase, JsonSerializerOptions? serializerOptions = null)
+    public CachulaRedisCache(IDatabase redisDatabase, JsonSerializerOptions? serializerOptions = null, CachulaRedisCacheSettings? settings = null)
     {
         _redisDatabase = redisDatabase ?? throw new ArgumentNullException(nameof(redisDatabase));
         _serializerOptions = serializerOptions ?? new JsonSerializerOptions
@@ -38,6 +35,11 @@ public class CachulaRedisCache : ICachulaDistributedCache
             //// This helps reduce payload size and avoids unnecessary data storage.
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
+        _settings = settings ?? new CachulaRedisCacheSettings();
+        if (_settings.BatchSize <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(settings), "BatchSize must be greater than zero.");
+        }
     }
 
     /// <inheritdoc />
