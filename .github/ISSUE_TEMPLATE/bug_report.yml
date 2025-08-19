@@ -1,0 +1,30 @@
+name: "🐞 Bug report"
+description: "Create a report to help us improve"
+labels: ["bug"]
+body:
+  - type: textarea
+    attributes:
+      label: Description
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps To Reproduce
+      description: How can we reproduce the problem?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Screenshots/Logs
+      description: If applicable, add logs or screenshots.
+  - type: input
+    attributes:
+      label: Version
+      description: Which version of Cachula are you using?
