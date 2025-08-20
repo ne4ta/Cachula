@@ -40,11 +40,16 @@ public class InMemorySingleFlightProtector : IStampedeProtector
         var result = new Dictionary<string, Task<T?>>();
         var toLoad = new List<string>();
 
+        var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
+
         foreach (var key in keys)
         {
-            if (_inflight.TryGetValue(key, out var lazyTask))
+            var lazy = _inflight.GetOrAdd(key, _ => new Lazy<Task<object>>(() => tcs.Task, true));
+            var task = lazy.Value;
+
+            if (!ReferenceEquals(task, tcs.Task))
             {
-                result[key] = GetBatchResultAsync<T>(lazyTask.Value, key);
+                result[key] = GetBatchResultAsync<T>(task, key);
             }
             else
             {
@@ -54,14 +59,19 @@ public class InMemorySingleFlightProtector : IStampedeProtector
 
         if (toLoad.Count > 0)
         {
-            var lazy = new Lazy<Task<object>>(ValueFactory, true);
+            _ = LoadAndCompleteAsync();
 
-            async Task<object> ValueFactory()
+            async Task LoadAndCompleteAsync()
             {
                 try
                 {
                     var loaded = await loader(toLoad).ConfigureAwait(false);
-                    return loaded.ToDictionary(kv => kv.Key, kv => (object?)kv.Value);
+                    var dict = loaded.ToDictionary(kv => kv.Key, kv => (object?)kv.Value);
+                    tcs.TrySetResult(dict);
+                }
+                catch (Exception ex)
+                {
+                    tcs.TrySetException(ex);
                 }
                 finally
                 {
@@ -74,13 +84,7 @@ public class InMemorySingleFlightProtector : IStampedeProtector
 
             foreach (var key in toLoad)
             {
-                _inflight[key] = lazy;
-            }
-
-            var batchTask = lazy.Value;
-            foreach (var key in toLoad)
-            {
-                result[key] = GetBatchResultAsync<T>(batchTask, key);
+                result[key] = GetBatchResultAsync<T>(tcs.Task, key);
             }
         }
 
