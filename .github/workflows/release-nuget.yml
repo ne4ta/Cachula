@@ -1,0 +1,112 @@
+name: Release NuGet Packages
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Override package version (e.g. 0.1.0 or 0.1.0-beta.2). If empty, uses tag or csproj version"
+        required: false
+        type: string
+      publish:
+        description: "Push to NuGet.org"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  build-pack-publish:
+    name: Build, Test, Pack, Publish
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+      DOTNET_NOLOGO: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDKs
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            9.0.x
+            8.0.x
+
+      - name: Show dotnet info
+        run: dotnet --info
+
+      - name: Restore
+        run: dotnet restore Cachula.sln
+
+      - name: Build (Release)
+        run: dotnet build Cachula.sln -c Release --no-restore
+
+      - name: Test
+        run: |
+          dotnet test tests/Cachula.Tests/Cachula.Tests.csproj -c Release --no-build --logger "trx;LogFileName=Cachula.Tests.trx"
+          dotnet test tests/Cachula.Redis.Tests/Cachula.Redis.Tests.csproj -c Release --no-build --logger "trx;LogFileName=Cachula.Redis.Tests.trx"
+
+      - name: Determine package version
+        id: version
+        shell: bash
+        run: |
+          INPUT_VER='${{ github.event.inputs.version || '' }}'
+          EVENT='${{ github.event_name }}'
+          TAG=''
+          if [ "$EVENT" = "release" ]; then
+            TAG='${{ github.event.release.tag_name }}'
+          elif [ "$EVENT" = "workflow_dispatch" ] && [ -n "$INPUT_VER" ]; then
+            # Use provided version input
+            echo "PKG_VERSION=$INPUT_VER" >> $GITHUB_ENV
+            echo "version=$INPUT_VER" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          if [ -n "$TAG" ]; then
+            # strip leading v or V (e.g., v1.2.3 -> 1.2.3)
+            CLEAN_TAG=${TAG#v}
+            CLEAN_TAG=${CLEAN_TAG#V}
+            echo "PKG_VERSION=$CLEAN_TAG" >> $GITHUB_ENV
+            echo "version=$CLEAN_TAG" >> $GITHUB_OUTPUT
+          else
+            echo "No explicit version; will use versions from csproj files"
+          fi
+
+      - name: Pack Cachula
+        run: |
+          if [ -n "$PKG_VERSION" ]; then
+            dotnet pack src/Cachula/Cachula.csproj -c Release -o out -p:ContinuousIntegrationBuild=true -p:Version=$PKG_VERSION
+          else
+            dotnet pack src/Cachula/Cachula.csproj -c Release -o out -p:ContinuousIntegrationBuild=true
+          fi
+
+      - name: Pack Cachula.Redis
+        run: |
+          if [ -n "$PKG_VERSION" ]; then
+            dotnet pack src/Cachula.Redis/Cachula.Redis.csproj -c Release -o out -p:ContinuousIntegrationBuild=true -p:Version=$PKG_VERSION
+          else
+            dotnet pack src/Cachula.Redis/Cachula.Redis.csproj -c Release -o out -p:ContinuousIntegrationBuild=true
+          fi
+
+      - name: Upload packages artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: |
+            out/*.nupkg
+            out/*.snupkg
+
+      - name: Publish to NuGet.org
+        if: >-
+          ${{ (github.event_name == 'release') || (github.event_name == 'workflow_dispatch' && inputs.publish == true) }}
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          if [ -z "$NUGET_API_KEY" ]; then
+            echo "NUGET_API_KEY secret is missing" >&2
+            exit 1
+          fi
+          dotnet nuget push "out/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
