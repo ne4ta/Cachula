@@ -36,7 +36,7 @@ public class CachulaCache(ICachulaEngine engine) : ICachulaCache
         CancellationToken cancellationToken = default)
     {
         var dict = await GetOrSetManyAsyncAsDict(keys, factory, expiration, cancellationToken);
-        return dict.Values.ToList();
+        return dict.Values;
     }
 
     /// <inheritdoc />
@@ -52,7 +52,7 @@ public class CachulaCache(ICachulaEngine engine) : ICachulaCache
             expiration,
             cancellationToken);
 
-        var result = new Dictionary<string, T>(StringComparer.Ordinal);
+        var result = new Dictionary<string, T>(entries.Count, StringComparer.Ordinal);
         foreach (var (key, entry) in entries)
         {
             if (!entry.IsNull)

@@ -15,6 +15,14 @@ public class CachulaRedisCache : ICachulaDistributedCache
     private readonly IDatabase _redisDatabase;
     private readonly JsonSerializerOptions _serializerOptions;
     private readonly CachulaRedisCacheSettings _settings;
+    
+    private static readonly JsonSerializerOptions DefaultSerializerOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        //// Ignore null values during serialization.
+        //// This helps reduce payload size and avoids unnecessary data storage.
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+    };
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CachulaRedisCache"/> class.
@@ -28,13 +36,7 @@ public class CachulaRedisCache : ICachulaDistributedCache
     public CachulaRedisCache(IDatabase redisDatabase, JsonSerializerOptions? serializerOptions = null, CachulaRedisCacheSettings? settings = null)
     {
         _redisDatabase = redisDatabase ?? throw new ArgumentNullException(nameof(redisDatabase));
-        _serializerOptions = serializerOptions ?? new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            //// Ignore null values during serialization.
-            //// This helps reduce payload size and avoids unnecessary data storage.
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        };
+        _serializerOptions = serializerOptions ?? DefaultSerializerOptions;
         _settings = settings ?? new CachulaRedisCacheSettings();
         if (_settings.BatchSize <= 0)
         {
@@ -50,7 +52,7 @@ public class CachulaRedisCache : ICachulaDistributedCache
             throw new ArgumentNullException(nameof(key));
         }
 
-        var value = await _redisDatabase.StringGetAsync(key);
+        var value = await _redisDatabase.StringGetAsync(key).ConfigureAwait(false);
         return FromRedisValue<T>(value);
     }
 
@@ -70,13 +72,29 @@ public class CachulaRedisCache : ICachulaDistributedCache
     public async Task<IDictionary<string, CachulaCacheEntry<T>>> GetManyAsync<T>(
         IEnumerable<string> keys, CancellationToken cancellationToken = default)
     {
-        var redisKeys = keys.Select(k => (RedisKey)k).ToArray();
-        var values = await _redisDatabase.StringGetAsync(redisKeys);
-        var result = new Dictionary<string, CachulaCacheEntry<T>>();
-        for (var i = 0; i < redisKeys.Length; i++)
+        if (keys == null)
         {
-            var value = values[i];
-            result[redisKeys[i]!] = FromRedisValue<T>(value);
+            throw new ArgumentNullException(nameof(keys));
+        }
+        
+        var keyArray = keys as string[] ?? keys.ToArray();
+        if (keyArray.Length == 0)
+        {
+            return new Dictionary<string, CachulaCacheEntry<T>>(0, StringComparer.Ordinal);
+        }
+        
+        var redisKeys = new RedisKey[keyArray.Length];
+        for (var i = 0; i < keyArray.Length; i++)
+        {
+            redisKeys[i] = keyArray[i];
+        }
+
+        var values = await _redisDatabase.StringGetAsync(redisKeys).ConfigureAwait(false);
+        
+        var result = new Dictionary<string, CachulaCacheEntry<T>>(keyArray.Length, StringComparer.Ordinal);
+        for (var i = 0; i < keyArray.Length; i++)
+        {
+            result[keyArray[i]] = FromRedisValue<T>(values[i]);
         }
 
         return result;
@@ -100,7 +118,7 @@ public class CachulaRedisCache : ICachulaDistributedCache
                 .ToList(); // ToList() is important here to execute the Select. It's important for the tasks to be created BEFORE batch.Execute().
 
             batch.Execute();
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
     }
 
@@ -112,7 +130,13 @@ public class CachulaRedisCache : ICachulaDistributedCache
             throw new ArgumentNullException(nameof(keys));
         }
 
-        var redisKeys = keys.Select(k => (RedisKey)k).ToArray();
+        var arr = keys as string[] ?? keys.ToArray();
+        if (arr.Length == 0)
+        {
+            return;
+        }
+
+        var redisKeys = Array.ConvertAll(arr, k => (RedisKey)k);
         await _redisDatabase.KeyDeleteAsync(redisKeys).ConfigureAwait(false);
     }
 
