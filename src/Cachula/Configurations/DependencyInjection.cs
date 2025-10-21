@@ -17,7 +17,7 @@ public static class DependencyInjection
     /// <param name="services">The service collection to add Cachula services to.</param>
     /// <returns>The updated service collection with Cachula services registered.</returns>
     /// <remarks>
-    /// Fun fact: the method name is a pun — "put on cachula" sounds like "put on a shirt", because "кашуля" (kaszula) means "shirt" in Belarusian and Polish.
+    /// Fun fact: the method name is a pun — "put on cachula" sounds like "put on a shirt", because "кашуля" (koszula) means "shirt" in Belarusian and Polish.
     /// </remarks>
     public static IServiceCollection PutOnCachula(this IServiceCollection services)
     {
@@ -25,7 +25,7 @@ public static class DependencyInjection
         {
             throw new ArgumentNullException(nameof(services));
         }
-        
+
         services.AddSingleton<ICachulaCache, CachulaCache>();
         services.AddSingleton<ICachulaEngine, CachulaEngine>();
         services.AddSingleton<IStampedeProtector, InMemorySingleFlightProtector>();
@@ -61,7 +61,7 @@ public static class DependencyInjection
         {
             throw new ArgumentNullException(nameof(services));
         }
-        
+
         if (distributedCache == null)
         {
             throw new ArgumentNullException(nameof(distributedCache));
