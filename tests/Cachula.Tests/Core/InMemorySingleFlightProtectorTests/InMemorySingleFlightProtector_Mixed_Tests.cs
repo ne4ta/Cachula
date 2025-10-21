@@ -43,21 +43,24 @@ public class InMemorySingleFlightProtector_Mixed_Tests
         var protector = new InMemorySingleFlightProtector();
         var loaderCallCount = new ConcurrentDictionary<string, int>();
 
+        var startGate = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
         async Task<int> LoaderSingle(string key)
         {
+            await startGate.Task;
             loaderCallCount.AddOrUpdate(key, 1, (_, v) => v + 1);
-            await Task.Delay(20);
+            await Task.Delay(50);
             return key.Length;
         }
 
         async Task<IDictionary<string, int>> LoaderBatch(IEnumerable<string> keys)
         {
+            await startGate.Task;
             foreach (var key in keys)
             {
                 loaderCallCount.AddOrUpdate(key, 1, (_, v) => v + 1);
             }
-
-            await Task.Delay(30);
+            await Task.Delay(60);
             return keys.ToDictionary(k => k, k => k.Length);
         }
 
@@ -69,10 +72,9 @@ public class InMemorySingleFlightProtector_Mixed_Tests
         var t6 = protector.RunManyAsync(["d", "e"], LoaderBatch);
         var t7 = protector.RunAsync("d", () => LoaderSingle("d"));
 
-        var allTasks = new List<Task<int>>
-        {
-            t1, t2, t5, t7
-        };
+        startGate.TrySetResult();
+
+        var allTasks = new List<Task<int>> { t1, t2, t5, t7 };
         allTasks.AddRange(t3.Values);
         allTasks.AddRange(t4.Values);
         allTasks.AddRange(t6.Values);
