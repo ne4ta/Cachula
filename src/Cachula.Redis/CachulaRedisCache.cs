@@ -159,7 +159,7 @@ public class CachulaRedisCache : ICachulaDistributedCache
 
         try
         {
-            var entry = JsonSerializer.Deserialize<CachulaCacheEntry<T>>(value!, _serializerOptions);
+            var entry = JsonSerializer.Deserialize<CachulaCacheEntry<T>>((string)value!, _serializerOptions);
             return entry ?? CachulaCacheEntry<T>.Null;
         }
         catch (JsonException)
