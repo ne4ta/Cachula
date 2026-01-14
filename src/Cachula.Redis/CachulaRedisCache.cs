@@ -82,19 +82,23 @@ public class CachulaRedisCache : ICachulaDistributedCache
         {
             return new Dictionary<string, CachulaCacheEntry<T>>(0, StringComparer.Ordinal);
         }
-        
-        var redisKeys = new RedisKey[keyArray.Length];
-        for (var i = 0; i < keyArray.Length; i++)
-        {
-            redisKeys[i] = keyArray[i];
-        }
 
-        var values = await _redisDatabase.StringGetAsync(redisKeys).ConfigureAwait(false);
-        
         var result = new Dictionary<string, CachulaCacheEntry<T>>(keyArray.Length, StringComparer.Ordinal);
-        for (var i = 0; i < keyArray.Length; i++)
+
+        foreach (var keyChunk in keyArray.Chunk(_settings.BatchSize))
         {
-            result[keyArray[i]] = FromRedisValue<T>(values[i]);
+            var redisKeys = new RedisKey[keyChunk.Length];
+            for (var i = 0; i < keyChunk.Length; i++)
+            {
+                redisKeys[i] = keyChunk[i];
+            }
+
+            var values = await _redisDatabase.StringGetAsync(redisKeys).ConfigureAwait(false);
+
+            for (var i = 0; i < keyChunk.Length; i++)
+            {
+                result[keyChunk[i]] = FromRedisValue<T>(values[i]);
+            }
         }
 
         return result;
