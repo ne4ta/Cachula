@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;net8.0;net9.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
         <LangVersion>latest</LangVersion>
         <Version>0.1.0-beta.1</Version>
-        <PackageReleaseNotes>Initial beta with netstandard2.0/net8.0/net9.0 targets.</PackageReleaseNotes>
+        <PackageReleaseNotes>Initial beta with netstandard2.0/net8.0/net9.0/net10.0 targets.</PackageReleaseNotes>
         <OutputType>Library</OutputType>
         <Authors>Dzmitry Koush</Authors>
         <PackageId>Cachula</PackageId>
@@ -29,12 +29,12 @@
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="System.Text.Json" Version="[8.0.5,9.0.0)" />
+        <PackageReference Include="System.Text.Json" Version="[8.0.5,11.0.0)" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="[9.0.0,10.0.0)" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="[9.0.0,10.0.0)" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="[9.0.0,11.0.0)" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="[9.0.0,11.0.0)" />
     </ItemGroup>
 
     <ItemGroup>

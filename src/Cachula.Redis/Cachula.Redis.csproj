@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;net8.0;net9.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
         <LangVersion>latest</LangVersion>
         <Version>0.1.0-beta.1</Version>
-        <PackageReleaseNotes>Initial beta of Redis provider (netstandard2.0/net8.0/net9.0).</PackageReleaseNotes>
+        <PackageReleaseNotes>Initial beta of Redis provider (netstandard2.0/net8.0/net9.0/net10.0).</PackageReleaseNotes>
         <OutputType>Library</OutputType>
         <Authors>Dzmitry Koush</Authors>
         <PackageId>Cachula.Redis</PackageId>
